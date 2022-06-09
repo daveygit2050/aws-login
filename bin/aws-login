@@ -1,0 +1,11 @@
+#!/bin/bash
+set -euo pipefail
+
+role_name=$1
+container_name=$(echo ${role_name} | rev | cut --delimiter "-" --fields "2-" | rev)
+
+signed_url=$(aws-vault login ${role_name} --stdout)
+encoded_url=$(jq -rn --arg x ${signed_url} '$x|@uri')
+firefox_url="ext+container:name=${container_name}&url=${encoded_url}"
+
+firefox ${firefox_url}
